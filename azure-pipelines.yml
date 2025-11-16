@@ -1,0 +1,47 @@
+# File: azure-pipelines.yml
+
+trigger:
+- main  # This pipeline will run on commits to the 'main' branch
+
+pool:
+  vmImage: 'windows-latest' # Use a Windows agent
+
+variables:
+  buildConfiguration: 'Release'
+  projectFile: '**/*.csproj' # Path to your .csproj file
+
+steps:
+- task: UseDotNet@2
+  displayName: 'Use .NET 8.0'
+  inputs:
+    packageType: 'sdk'
+    version: '8.0.x'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Restore Dependencies'
+  inputs:
+    command: 'restore'
+    projects: $(projectFile)
+    feedsToUse: 'select'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build Project'
+  inputs:
+    command: 'build'
+    projects: $(projectFile)
+    arguments: '--configuration $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Run NUnit Tests'
+  inputs:
+    command: 'test'
+    projects: $(projectFile)
+    arguments: '--configuration $(buildConfiguration) --logger trx --results-directory $(Agent.TempDirectory)/TestResults'
+
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results'
+  inputs:
+    testResultsFormat: 'VSTest' # 'VSTest' format works for NUnit's trx files
+    testResultsFiles: '**/*.trx'
+    searchFolder: '$(Agent.TempDirectory)/TestResults'
+  condition: succeededOrFailed() # Always publish results
