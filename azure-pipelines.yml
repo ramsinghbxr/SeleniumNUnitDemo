@@ -9,30 +9,32 @@ pool:
 variables:
   buildConfiguration: 'Release'
   projectFile: '**/*.csproj' # Path to your .csproj file
+  # Define the folder where publish output will go 
+  outputFolder: '$(Build.ArtifactStagingDirectory)/DotNetCore3App' 
 
 steps:
 - task: UseDotNet@2
-  displayName: 'Use .NET 8.0'
+  displayName: 'Install .NET Core 3.0 SDK (EOL)'
   inputs:
     packageType: 'sdk'
-    version: '8.0.x'
+    version: '3.0.x' # ***CHANGED: Installing the EOL 3.0 version***
 
 - task: DotNetCoreCLI@2
-  displayName: 'Restore Dependencies'
+  displayName: 'Restore Dependencies (3.0)'
   inputs:
     command: 'restore'
     projects: $(projectFile)
     feedsToUse: 'select'
 
 - task: DotNetCoreCLI@2
-  displayName: 'Build Project'
+  displayName: 'Build Project (3.0)'
   inputs:
     command: 'build'
     projects: $(projectFile)
     arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
-  displayName: 'Run NUnit Tests'
+  displayName: 'Run NUnit Tests (3.0)'
   inputs:
     command: 'test'
     projects: $(projectFile)
@@ -41,7 +43,20 @@ steps:
 - task: PublishTestResults@2
   displayName: 'Publish Test Results'
   inputs:
-    testResultsFormat: 'VSTest' # 'VSTest' format works for NUnit's trx files
+    testResultsFormat: 'VSTest'
     testResultsFiles: '**/*.trx'
     searchFolder: '$(Agent.TempDirectory)/TestResults'
-  condition: succeededOrFailed() # Always publish results
+  condition: succeededOrFailed()
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish Application (3.0)'
+  inputs:
+    command: 'publish'
+    projects: $(projectFile)
+    arguments: '--configuration $(buildConfiguration) --output $(outputFolder)'
+    
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Build Artifacts'
+  inputs:
+    pathToPublish: '$(outputFolder)'
+    artifactName: 'drop-dotnet-core-3.0'
