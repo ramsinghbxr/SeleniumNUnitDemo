@@ -31,17 +31,21 @@ steps:
     projects: $(projectFile)
     arguments: '--configuration $(buildConfiguration)'
 
+- # OLD (Problematic)
+#     arguments: '--configuration $(buildConfiguration) --logger trx --results-directory $(Agent.TempDirectory)/TestResults'
+
+# NEW (Recommended Fix)
 - task: DotNetCoreCLI@2
   displayName: 'Run NUnit Tests'
   inputs:
     command: 'test'
     projects: $(projectFile)
-    arguments: '--configuration $(buildConfiguration) --logger trx --results-directory $(Agent.TempDirectory)/TestResults'
+    arguments: '--configuration $(buildConfiguration)' # Remove explicit logger/results-directory arguments
 
 - task: PublishTestResults@2
   displayName: 'Publish Test Results'
   inputs:
-    testResultsFormat: 'VSTest' # 'VSTest' format works for NUnit's trx files
+    testResultsFormat: 'VSTest'
     testResultsFiles: '**/*.trx'
-    searchFolder: '$(Agent.TempDirectory)/TestResults'
-  condition: succeededOrFailed() # Always publish results
+    searchFolder: '$(Agent.TempDirectory)/TestResults' # This path should be where the test results are written
+  condition: succeededOrFailed()
