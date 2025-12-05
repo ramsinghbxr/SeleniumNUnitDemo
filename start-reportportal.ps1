@@ -103,7 +103,7 @@ function Start-ReportPortal {
         exit 1
     }
     
-    Write-Host "Waiting for services to start (30 seconds)..." -ForegroundColor $colors.Yellow
+    Write-Host "Waiting for services to start. Please wait..." -ForegroundColor $colors.Yellow
     Start-Sleep -Seconds 30
     
     Write-Host "`nChecking service status..." -ForegroundColor $colors.Cyan
@@ -157,7 +157,7 @@ function Restart-ReportPortal {
     Write-Host "Restarting services..." -ForegroundColor $colors.Yellow
     & docker-compose -f $composeFile restart
     
-    Write-Host "Waiting for services to restart (15 seconds)..." -ForegroundColor $colors.Yellow
+    Write-Host "Waiting for services to restart. Please wait..." -ForegroundColor $colors.Yellow
     Start-Sleep -Seconds 15
     
     Write-Host "`nChecking service status..." -ForegroundColor $colors.Cyan
@@ -211,71 +211,15 @@ function Show-Status {
 function Show-Help {
     Write-Header "ReportPortal Docker Manager"
     
-    Write-Host @"
-USAGE:
-    .\start-reportportal.ps1 [OPTIONS]
-
-OPTIONS:
-    -Start      Start ReportPortal services (default)
-    -Stop       Stop ReportPortal services
-    -Restart    Restart ReportPortal services
-    -Logs       View live logs from all services
-    -Status     Show service status
-    -Clean      Remove all containers and data (WARNING!)
-    -Help       Show this help message
-
-EXAMPLES:
-    Start services:
-        .\start-reportportal.ps1 -Start
-
-    View logs:
-        .\start-reportportal.ps1 -Logs
-
-    Stop services:
-        .\start-reportportal.ps1 -Stop
-
-    Check status:
-        .\start-reportportal.ps1 -Status
-
-QUICK START:
-    1. Start services:
-        .\start-reportportal.ps1 -Start
-
-    2. Open in browser:
-        http://localhost:8081
-
-    3. Login with:
-        Email: superadmin@reportportal.io
-        Password: erebus
-
-    4. Create project "selenium-tests"
-
-    5. Get API token from profile
-
-    6. Update reportportal.json with token
-
-    7. Run tests:
-        dotnet test
-
-SERVICES:
-    - ReportPortal UI:    http://localhost:8081
-    - ReportPortal API:   http://localhost:8080
-    - RabbitMQ Manager:   http://localhost:15672
-    - MinIO Console:      http://localhost:9001
-    - PostgreSQL:         localhost:5432
-    - MongoDB:            localhost:27017
-
-TROUBLESHOOTING:
-    Check logs:
-        .\start-reportportal.ps1 -Logs
-
-    Restart services:
-        .\start-reportportal.ps1 -Restart
-
-    Full reset (delete data):
-        .\start-reportportal.ps1 -Clean
-
-"@ -ForegroundColor $colors.Cyan
+    Write-Host "USAGE: .\start-reportportal.ps1 [OPTIONS]" -ForegroundColor $colors.Cyan
+    Write-Host ""
+    Write-Host "OPTIONS:" -ForegroundColor $colors.Yellow
+    Write-Host "  -Start      Start ReportPortal services" -ForegroundColor $colors.Cyan
+    Write-Host "  -Stop       Stop ReportPortal services" -ForegroundColor $colors.Cyan
+    Write-Host "  -Restart    Restart ReportPortal services" -ForegroundColor $colors.Cyan
+    Write-Host "  -Logs       View live logs" -ForegroundColor $colors.Cyan
+    Write-Host "  -Status     Show service status" -ForegroundColor $colors.Cyan
+    Write-Host "  -Help       Show this help" -ForegroundColor $colors.Cyan
 }
 
 # Main execution
