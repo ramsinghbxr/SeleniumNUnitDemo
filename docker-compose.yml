@@ -1,0 +1,133 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:13-alpine
+    container_name: reportportal-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: reportportal
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MongoDB for logs
+  mongodb:
+    image: mongo:5.0
+    container_name: reportportal-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # RabbitMQ for messaging
+  rabbitmq:
+    image: rabbitmq:3.8-management-alpine
+    container_name: reportportal-rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: rpadmin
+      RABBITMQ_DEFAULT_PASS: rpadminpass
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MinIO for file storage
+  minio:
+    image: minio/minio:latest
+    container_name: reportportal-minio
+    restart: always
+    command: server /minio_data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/minio_data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ReportPortal API
+  api:
+    image: reportportal/service-api:5.8.0
+    container_name: reportportal-api
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      RP_DB_HOST: postgres
+      RP_DB_USER: postgres
+      RP_DB_PASS: postgres
+      RP_BINARYSTORE_TYPE: minio
+      RP_BINARYSTORE_MINIO_ENDPOINT: http://minio:9000
+      RP_BINARYSTORE_MINIO_ACCESSKEY: minioadmin
+      RP_BINARYSTORE_MINIO_SECRETKEY: minioadmin
+      RP_AMQP_HOST: rabbitmq
+      RP_AMQP_USER: rpadmin
+      RP_AMQP_PASS: rpadminpass
+      RP_AMQP_API_ADDRESS: http://rabbitmq:15672
+      RP_AMQP_API_USER: rpadmin
+      RP_AMQP_API_PASSWORD: rpadminpass
+      RP_MONGO_DB: reportportal
+      RP_MONGO_HOST: mongodb
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ReportPortal UI
+  ui:
+    image: reportportal/service-ui:5.8.0
+    container_name: reportportal-ui
+    restart: always
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      RP_API_URL: http://api:8080
+    ports:
+      - "8081:8080"
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  rabbitmq_data:
+  minio_data:
+

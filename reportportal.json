@@ -1,0 +1,15 @@
+{
+  "rp.endpoint": "http://localhost:8080",
+  "rp.project": "selenium-tests",
+  "rp.username": "superadmin",
+  "rp.apiKey": "YOUR_API_TOKEN_HERE",
+  "rp.launch": "Selenium NUnit Tests",
+  "rp.description": "Automated Selenium tests with NUnit",
+  "rp.attributes": [
+    "selenium",
+    "nunit",
+    "automation"
+  ],
+  "rp.skipped.issue": false,
+  "rp.isLaunchUuidNeeded": false
+}

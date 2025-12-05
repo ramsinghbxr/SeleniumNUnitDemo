@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <LoggerRunSettings>
+    <Loggers>
+      <Logger friendlyName="ReportPortal" uri="logger://ReportPortal.NUnitExtension.ReportPortalLogger" assemblyQualifiedName="ReportPortal.NUnitExtension.ReportPortalLogger, ReportPortal.NUnitExtension" enabled="True" />
+    </Loggers>
+  </LoggerRunSettings>
+  
+  <TestRunParameters>
+    <!-- Optional: Configure test run parameters -->
+  </TestRunParameters>
+</RunSettings>
