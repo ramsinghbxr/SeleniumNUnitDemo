@@ -2,6 +2,7 @@ using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using SeleniumNUnitDemo.Pages;
+using SeleniumNUnitDemo.Utilities;
 using WebDriverManager;
 using WebDriverManager.DriverConfigs.Impl;
 
@@ -27,14 +28,8 @@ public class SwagLabsTests_POM
     [SetUp]
     public void Setup()
     {
-        // This runs before each test
-        var service = ChromeDriverService.CreateDefaultService();
-        var options = new ChromeOptions();
-        options.AddArgument("--disable-dev-shm-usage");
-        options.AddArgument("--no-sandbox");
-        options.AddArgument("--start-maximized");
-
-        _driver = new ChromeDriver(service, options);
+        // Initialize Chrome driver with popup suppression
+        _driver = ChromeDriverConfig.CreateChromeDriver();
         _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
     }
 

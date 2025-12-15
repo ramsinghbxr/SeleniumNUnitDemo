@@ -1,8 +1,7 @@
-// File: SwagLabsTests.cs
-
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using SeleniumNUnitDemo.Utilities;
 using WebDriverManager;
 using WebDriverManager.DriverConfigs.Impl;
 
@@ -17,16 +16,8 @@ public class SwagLabsTests
     [SetUp] // NUnit's attribute for a method that runs BEFORE each test
     public void SetupTest()
     {
-        // Use Selenium's built-in driver manager for better compatibility
-        var service = ChromeDriverService.CreateDefaultService();
-        var options = new ChromeOptions();
-        options.AddArgument("--disable-dev-shm-usage");
-        options.AddArgument("--no-sandbox");
-        
-        _driver = new ChromeDriver(service, options);
-        _driver.Manage().Window.Maximize();
-
-        // Use implicit waits to give elements time to appear
+        // Initialize Chrome driver with popup suppression
+        _driver = ChromeDriverConfig.CreateChromeDriver();
         _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);
     }
 

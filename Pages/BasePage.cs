@@ -84,21 +84,24 @@ public abstract class BasePage
     }
 
     /// <summary>
-    /// Take screenshot
+    /// Take screenshot and return the file path
     /// </summary>
-    public void TakeScreenshot(string fileName)
+    public string TakeScreenshot(string fileName)
     {
         try
         {
             var screenshot = ((ITakesScreenshot)_driver).GetScreenshot();
             string screenshotDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Screenshots");
             Directory.CreateDirectory(screenshotDir);
-            string filePath = Path.Combine(screenshotDir, fileName + ".png");
+            string filePath = Path.Combine(screenshotDir, $"{fileName}_{DateTime.Now:yyyyMMdd_HHmmss}.png");
             screenshot.SaveAsFile(filePath);
+            Console.WriteLine($"✓ Screenshot saved: {filePath}");
+            return filePath;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to take screenshot: {ex.Message}");
+            Console.WriteLine($"✗ Failed to take screenshot: {ex.Message}");
+            return string.Empty;
         }
     }
 
