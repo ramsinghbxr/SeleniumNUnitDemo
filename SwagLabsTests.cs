@@ -65,7 +65,7 @@ public class SwagLabsTests
 
         // 4. Assert: Verify the error message is correct
         var errorMessage = _driver.FindElement(By.CssSelector("h3[data-test='error']")).Text;
-        Assert.That(errorMessage, Does.Contain("Sorry, this user has been locked out."), "Error message was incorrect or not found.");
+        Assert.That(errorMessage, Does.Contain("Sorry, this user has been locked out.EXTRA"), "Error message was incorrect or not found.");
     }
 
     [Test] // This is Test Case 3
